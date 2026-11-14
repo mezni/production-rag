@@ -6,13 +6,10 @@ from pypdf import PdfReader
 
 
 class DocumentParser(Protocol):
-
-    def parse(self, file_path: Path) -> str:
-        ...
+    def parse(self, file_path: Path) -> str: ...
 
 
 class PDFParser:
-
     def parse(self, file_path: Path) -> str:
         reader = PdfReader(str(file_path))
 
@@ -26,20 +23,15 @@ class PDFParser:
 
 
 class DOCXParser:
-
     def parse(self, file_path: Path) -> str:
         document = WordDocument(file_path)
 
-        paragraphs = [
-            paragraph.text
-            for paragraph in document.paragraphs
-        ]
+        paragraphs = [paragraph.text for paragraph in document.paragraphs]
 
         return "\n".join(paragraphs)
 
 
 class TXTParser:
-
     def parse(self, file_path: Path) -> str:
         return file_path.read_text(
             encoding="utf-8",
@@ -48,7 +40,6 @@ class TXTParser:
 
 
 class ParserFactory:
-
     @staticmethod
     def create(file_path: Path) -> DocumentParser:
 
@@ -63,8 +54,6 @@ class ParserFactory:
         parser_class = parsers.get(extension)
 
         if parser_class is None:
-            raise ValueError(
-                f"No parser available for {extension}"
-            )
+            raise ValueError(f"No parser available for {extension}")
 
         return parser_class()
