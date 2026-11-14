@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.gitignore` now covers Python caches, virtual environments, build artifacts,
   environment files, and editor/OS files.
 
+### Removed
+
+- `__pycache__` directories and their compiled `.pyc` files from version control.
+
 ## [0.1.0] - 2026-11-13
 
 ### Added
