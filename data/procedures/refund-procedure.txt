@@ -1,0 +1,15 @@
+Refund Procedure
+
+1. Verify the customer order number and purchase date in the billing system.
+2. Confirm the item is eligible under the 30-day return policy.
+3. Check that the product is unused and in its original packaging.
+4. Issue a return authorization number to the customer.
+5. Instruct the customer to ship the item to the returns warehouse.
+6. Inspect the returned item upon arrival and record the condition.
+7. Approve or reject the refund in the billing system within two business days.
+8. Refund the original payment method within five to ten business days.
+9. Notify the customer by email once the refund has been processed.
+10. Record the case outcome in the support ticketing system.
+
+Escalation: contact the finance team if the refund amount exceeds 1,000 USD
+or if the original payment method is no longer available.
