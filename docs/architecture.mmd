@@ -1,0 +1,426 @@
+# Production RAG — Architecture Diagrams
+
+## 1. High-Level System Architecture
+
+```mermaid
+flowchart TB
+    USER["User"]
+    API["FastAPI Application"]
+    AUTH["Authentication & Authorization"]
+
+    subgraph INDEXING["Indexing Pipeline"]
+        FILES["Source Documents"]
+        VALIDATOR["Document Validator"]
+        PARSER["Document Parser"]
+        NORMALIZER["Text Normalizer"]
+        METADATA["Metadata Extractor"]
+        DOC["Document Model"]
+        CHUNKING["Chunking Service"]
+        CHUNKS["Chunk Models"]
+        EMBEDDING["Embedding Service"]
+        VECTORS["Embedding Vectors"]
+        INDEX["Vector Index"]
+    end
+
+    subgraph QUERY["Query Pipeline"]
+        QUERY_PROCESSOR["Query Processor"]
+        QUERY_EMBEDDING["Query Embedding"]
+        RETRIEVAL["Retrieval Service"]
+        FILTER["Metadata & Authorization Filtering"]
+        RERANK["Reranking Service"]
+        CONTEXT["Context Builder"]
+        GENERATION["LLM Generation"]
+        VALIDATION["Answer Validation"]
+        RESPONSE["Answer with Citations"]
+    end
+
+    subgraph STORAGE["Storage Layer"]
+        DOCUMENT_STORE[("Original Document Store")]
+        CHUNK_STORE[("Chunk & Metadata Store")]
+        VECTOR_DB[("PostgreSQL + pgvector")]
+    end
+
+    LLM["LLM Provider"]
+    EMBED_PROVIDER["Embedding Provider"]
+
+    FILES --> VALIDATOR
+    VALIDATOR --> PARSER
+    PARSER --> NORMALIZER
+    NORMALIZER --> METADATA
+    METADATA --> DOC
+    DOC --> DOCUMENT_STORE
+    DOC --> CHUNKING
+    CHUNKING --> CHUNKS
+    CHUNKS --> CHUNK_STORE
+    CHUNKS --> EMBEDDING
+    EMBEDDING --> EMBED_PROVIDER
+    EMBED_PROVIDER --> VECTORS
+    VECTORS --> INDEX
+    INDEX --> VECTOR_DB
+
+    USER --> API
+    API --> AUTH
+    AUTH --> QUERY_PROCESSOR
+    QUERY_PROCESSOR --> QUERY_EMBEDDING
+    QUERY_EMBEDDING --> EMBED_PROVIDER
+    QUERY_EMBEDDING --> RETRIEVAL
+    VECTOR_DB --> RETRIEVAL
+    CHUNK_STORE --> RETRIEVAL
+    RETRIEVAL --> FILTER
+    FILTER --> RERANK
+    RERANK --> CONTEXT
+    CONTEXT --> GENERATION
+    GENERATION --> LLM
+    LLM --> VALIDATION
+    VALIDATION --> RESPONSE
+    RESPONSE --> API
+    API --> USER
+
+    style INDEXING fill:#eff6ff,stroke:#2563eb,color:#1e3a8a
+    style QUERY fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95
+    style STORAGE fill:#ecfdf5,stroke:#16a34a,color:#14532d
+```
+
+## 2. Document Indexing Pipeline
+
+```mermaid
+flowchart TD
+    A["Source Document"]
+    B["Document Validator"]
+    C{"Valid File?"}
+    D["Document Parser"]
+    E["Text Normalizer"]
+    F["Metadata Extractor"]
+    G["Document Factory"]
+    H["Document Model"]
+    I["Chunking Service"]
+    J["Chunking Configuration"]
+    K["Recursive Character Splitter"]
+    L["Boundary Selection"]
+    M["Overlap Handling"]
+    N["Chunk Model"]
+    O["Embedding Service"]
+    P["Embedding Provider"]
+    Q["Vector Database"]
+
+    A --> B
+    B --> C
+    C -->|No| R["Validation Error"]
+    C -->|Yes| D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    J --> I
+    I --> K
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+
+    style H fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    style N fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    style Q fill:#dcfce7,stroke:#16a34a,color:#14532d
+    style R fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+```
+
+## 3. Query and Retrieval Pipeline
+
+```mermaid
+flowchart TD
+    A["User Question"]
+    B["API Gateway"]
+    C["Authentication"]
+    D["Authorization"]
+    E["Query Processing"]
+    F["Query Embedding"]
+    G["Embedding Provider"]
+    H["Vector Search"]
+    I["Metadata Filtering"]
+    J["Document Access Filtering"]
+    K["Top-K Results"]
+    L["Reranking"]
+    M["Context Builder"]
+    N["Prompt Construction"]
+    O["LLM Provider"]
+    P["Answer Validation"]
+    Q{"Sufficient Evidence?"}
+    R["Answer with Citations"]
+    S["Insufficient Evidence Response"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    G --> H
+    H --> I
+    I --> J
+    J --> K
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+    O --> P
+    P --> Q
+    Q -->|Yes| R
+    Q -->|No| S
+
+    style R fill:#dcfce7,stroke:#16a34a,color:#14532d
+    style S fill:#fef3c7,stroke:#d97706,color:#78350f
+```
+
+## 4. Application Component Architecture
+
+```mermaid
+flowchart TB
+    subgraph APPLICATION["Application Layer"]
+        MAIN["Application Entry Point"]
+        API["API Controllers"]
+    end
+
+    subgraph DOMAIN["Domain Layer"]
+        DOC["Document"]
+        CHUNK["Chunk"]
+        EMB["Embedding"]
+        QUERY["Query"]
+        RESULT["Retrieval Result"]
+        RESPONSE["RAG Response"]
+    end
+
+    subgraph SERVICES["Service Layer"]
+        INGESTION["Document Ingestion Service"]
+        CHUNKING["Chunking Service"]
+        EMBEDDING["Embedding Service"]
+        RETRIEVAL["Retrieval Service"]
+        CONTEXT["Context Builder"]
+        GENERATION["Generation Service"]
+    end
+
+    subgraph INFRASTRUCTURE["Infrastructure Layer"]
+        PARSERS["Document Parsers"]
+        PROVIDER["Embedding Provider"]
+        VECTOR["Vector Repository"]
+        STORE["Document Repository"]
+        LLM["LLM Provider"]
+    end
+
+    MAIN --> API
+    API --> INGESTION
+    API --> RETRIEVAL
+
+    INGESTION --> PARSERS
+    INGESTION --> DOC
+    INGESTION --> STORE
+    INGESTION --> CHUNKING
+
+    CHUNKING --> CHUNK
+    CHUNKING --> EMBEDDING
+    EMBEDDING --> PROVIDER
+    EMBEDDING --> VECTOR
+
+    RETRIEVAL --> VECTOR
+    RETRIEVAL --> STORE
+    RETRIEVAL --> CONTEXT
+    CONTEXT --> GENERATION
+    GENERATION --> LLM
+    GENERATION --> RESPONSE
+
+    DOC -.-> CHUNK
+    CHUNK -.-> EMB
+    EMB -.-> RESULT
+    RESULT -.-> RESPONSE
+
+    style APPLICATION fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    style DOMAIN fill:#fef3c7,stroke:#d97706,color:#78350f
+    style SERVICES fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    style INFRASTRUCTURE fill:#dcfce7,stroke:#16a34a,color:#14532d
+```
+
+## 5. Domain Model Relationships
+
+```mermaid
+classDiagram
+    class Document {
+        +str document_id
+        +str filename
+        +str file_type
+        +str content
+        +dict metadata
+    }
+
+    class Chunk {
+        +str chunk_id
+        +str document_id
+        +int chunk_index
+        +str content
+        +int start_char
+        +int end_char
+        +dict metadata
+    }
+
+    class Embedding {
+        +str embedding_id
+        +str chunk_id
+        +str model
+        +int dimensions
+        +list vector
+    }
+
+    class Query {
+        +str query_id
+        +str question
+        +dict filters
+    }
+
+    class RetrievalResult {
+        +str chunk_id
+        +float similarity_score
+        +int rank
+    }
+
+    class RAGResponse {
+        +str answer
+        +list citations
+        +bool grounded
+    }
+
+    Document "1" --> "*" Chunk : produces
+    Chunk "1" --> "0..1" Embedding : represented by
+    Query "1" --> "*" RetrievalResult : retrieves
+    RetrievalResult "*" --> "1" Chunk : references
+    Query "1" --> "0..1" RAGResponse : generates
+```
+
+## 6. Chunking Algorithm
+
+```mermaid
+flowchart TD
+    A["Normalized Document Text"]
+    B["Read Chunking Configuration"]
+    C["Set Starting Offset"]
+    D["Calculate Maximum Chunk Boundary"]
+    E{"End of Document?"}
+    F["Search Paragraph Boundary"]
+    G{"Boundary Found?"}
+    H["Search Line Boundary"]
+    I{"Boundary Found?"}
+    J["Search Sentence Boundary"]
+    K{"Boundary Found?"}
+    L["Fallback to Maximum Boundary"]
+    M["Create Chunk"]
+    N["Record Character Offsets"]
+    O{"More Text?"}
+    P["Calculate Next Start with Overlap"]
+    Q["Return Chunks"]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E -->|Yes| Q
+    E -->|No| F
+    F --> G
+    G -->|Yes| M
+    G -->|No| H
+    H --> I
+    I -->|Yes| M
+    I -->|No| J
+    J --> K
+    K -->|Yes| M
+    K -->|No| L
+    L --> M
+    M --> N
+    N --> O
+    O -->|Yes| P
+    P --> D
+    O -->|No| Q
+
+    style A fill:#dbeafe,stroke:#2563eb,color:#1e3a8a
+    style M fill:#ede9fe,stroke:#7c3aed,color:#4c1d95
+    style Q fill:#dcfce7,stroke:#16a34a,color:#14532d
+```
+
+## 7. Planned Production Infrastructure
+
+```mermaid
+flowchart TB
+    CLIENT["Clients"]
+    LB["Load Balancer / API Gateway"]
+    API["FastAPI Application"]
+
+    subgraph PROCESSING["Processing Services"]
+        INGEST["Ingestion Workers"]
+        QUERY["Query Service"]
+        EMBED["Embedding Service"]
+        GENERATE["Generation Service"]
+    end
+
+    QUEUE[("Message Queue")]
+    OBJECT[("Object Storage")]
+    DB[("PostgreSQL + pgvector")]
+    LLM["LLM Provider"]
+    EMB_PROVIDER["Embedding Provider"]
+
+    OBS["OpenTelemetry"]
+    TRACE["Langfuse"]
+    LOG["Centralized Logs"]
+
+    CLIENT --> LB
+    LB --> API
+    API --> QUEUE
+    QUEUE --> INGEST
+    INGEST --> OBJECT
+    INGEST --> EMBED
+    EMBED --> EMB_PROVIDER
+    EMBED --> DB
+
+    API --> QUERY
+    QUERY --> EMBED
+    QUERY --> DB
+    QUERY --> GENERATE
+    GENERATE --> LLM
+
+    API -.-> OBS
+    INGEST -.-> OBS
+    QUERY -.-> OBS
+    GENERATE -.-> TRACE
+    OBS --> LOG
+```
+
+## 8. Diagram Status
+
+| Diagram | Scope | Status |
+|---|---|---|
+| High-Level System Architecture | Complete RAG lifecycle | Initial design |
+| Document Indexing Pipeline | Ingestion and chunking | Designed |
+| Query and Retrieval Pipeline | Retrieval and generation | Planned |
+| Application Component Architecture | Layer and service boundaries | Initial design |
+| Domain Model Relationships | Document and chunk entities | Initial design |
+| Chunking Algorithm | Recursive splitting | Designed |
+| Production Infrastructure | Deployment and operations | Target architecture |
+
+## 9. Architecture Evolution
+
+| Milestone | Architecture addition |
+|---|---|
+| Day 1 | RAG indexing and query pipelines |
+| Day 2 | Document ingestion components |
+| Day 3 | Chunking service and chunk model |
+| Day 4 | Embedding service and provider |
+| Day 5 | Vector database and repository |
+| Day 6 | Retrieval service |
+| Day 7 | Reranking |
+| Day 8 | LLM generation |
+| Day 9 | Advanced RAG |
+| Day 10 | Evaluation |
+| Day 11 | Security |
+| Day 12 | Observability |
+| Day 13 | Performance engineering |
+| Day 14 | Production deployment |
+| Day 15 | Enterprise architecture |
+```
