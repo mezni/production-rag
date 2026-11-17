@@ -4,7 +4,6 @@ from rag.chunking.models import DocumentChunk
 
 
 class RecursiveChunker:
-
     def __init__(
         self,
         chunk_size: int = 1000,
@@ -40,7 +39,7 @@ class RecursiveChunker:
 
         if not separator:
             return [
-                text[i:i + self.chunk_size]
+                text[i : i + self.chunk_size]
                 for i in range(
                     0,
                     len(text),
@@ -54,12 +53,7 @@ class RecursiveChunker:
         current = ""
 
         for part in parts:
-
-            candidate = (
-                current + separator + part
-                if current
-                else part
-            )
+            candidate = current + separator + part if current else part
 
             if len(candidate) <= self.chunk_size:
                 current = candidate

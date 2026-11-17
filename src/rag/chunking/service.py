@@ -3,7 +3,6 @@ from rag.chunking.validator import ChunkValidator
 
 
 class ChunkingService:
-
     def __init__(
         self,
         strategy: ChunkingStrategy,

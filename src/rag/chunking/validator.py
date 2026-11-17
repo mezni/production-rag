@@ -2,7 +2,6 @@ from rag.chunking.models import DocumentChunk
 
 
 class ChunkValidator:
-
     @staticmethod
     def validate(
         chunks: list[DocumentChunk],
@@ -12,7 +11,6 @@ class ChunkValidator:
             raise ValueError("No chunks generated")
 
         for chunk in chunks:
-
             if not chunk.content.strip():
                 raise ValueError("Empty chunk")
 

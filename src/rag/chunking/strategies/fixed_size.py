@@ -4,7 +4,6 @@ from rag.chunking.models import DocumentChunk
 
 
 class FixedSizeChunker:
-
     def __init__(
         self,
         chunk_size: int = 1000,
