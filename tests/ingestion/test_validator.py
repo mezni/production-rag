@@ -1,10 +1,8 @@
 import pytest
 
-from pathlib import Path
-
 from rag.ingestion.validator import (
-    DocumentValidator,
     DocumentValidationError,
+    DocumentValidator,
 )
 
 

@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from rag.models.document import Document
-from rag.ingestion.validator import DocumentValidator
-from rag.ingestion.parser import ParserFactory
-from rag.ingestion.normalizer import TextNormalizer
 from rag.ingestion.metadata import MetadataExtractor
+from rag.ingestion.normalizer import TextNormalizer
+from rag.ingestion.parser import ParserFactory
+from rag.ingestion.validator import DocumentValidator
+from rag.models.document import Document
 
 
 class DocumentIngestionService:

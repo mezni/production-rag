@@ -508,3 +508,26 @@ Vector Database (Day 5)
 - Updated `docs/architecture.mmd`
 
 **Project status:** Three learning milestones completed. The next focus is Embeddings Engineering.
+
+
+## Day 4 — Embeddings Engineering
+
+### Added
+- Embedding domain model.
+- Embedding provider protocol.
+- OpenAI embedding provider.
+- Embedding service.
+- Vector dimension validation.
+- Single and batch embedding generation.
+- Embedding service unit tests.
+- Embedding engineering documentation.
+
+### Architecture Decisions
+- Introduced provider abstraction.
+- Selected OpenAI text-embedding-3-small.
+- Defined vector dimension configuration.
+- Established embedding validation boundaries.
+- Prepared the architecture for pgvector integration.
+
+### Next
+- Day 5 — Advanced Document Chunking Engineering.

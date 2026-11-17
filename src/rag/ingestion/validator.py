@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 SUPPORTED_FORMATS = {".pdf", ".docx", ".txt"}
 
 

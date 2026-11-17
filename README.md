@@ -41,9 +41,7 @@ from pathlib import Path
 from rag.chunking import ChunkingConfig, ChunkingService
 from rag.ingestion.service import DocumentIngestionService
 
-document = DocumentIngestionService().ingest(
-    Path("data/contracts/contract-4821.pdf")
-)
+document = DocumentIngestionService().ingest(Path("data/contracts/contract-4821.pdf"))
 
 chunks = ChunkingService(ChunkingConfig()).chunk_document(document)
 
