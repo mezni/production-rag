@@ -1,9 +1,9 @@
-from rag.chunking.config import ChunkingConfig
 from rag.chunking.service import ChunkingService
+from rag.chunking.strategies.fixed_size import FixedSizeChunker
 from rag.models.document import Document
 
 
-def test_chunk_document_preserves_document_metadata():
+def test_process_chunks_document_with_strategy():
     document = Document(
         document_id="doc-4821",
         filename="contract-4821.txt",
@@ -12,14 +12,13 @@ def test_chunk_document_preserves_document_metadata():
         metadata={"source_path": "data/contracts/contract-4821.txt"},
     )
 
-    service = ChunkingService(ChunkingConfig(chunk_size=100, chunk_overlap=20))
+    service = ChunkingService(
+        FixedSizeChunker(chunk_size=100, overlap=20),
+    )
 
-    chunks = service.chunk_document(document)
+    chunks = service.process(document.content, document.document_id)
 
     assert len(chunks) > 1
     assert all(chunk.document_id == "doc-4821" for chunk in chunks)
     assert [chunk.chunk_index for chunk in chunks] == list(range(len(chunks)))
-    assert all(
-        chunk.metadata["source_path"] == "data/contracts/contract-4821.txt"
-        for chunk in chunks
-    )
+    assert all(chunk.content.strip() for chunk in chunks)

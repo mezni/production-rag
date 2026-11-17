@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings>=2.16.3",
     "pypdf>=7.1.0",
     "python-docx>=1.2.0",
+    "tiktoken>=0.14.0",
 ]
 
 [project.scripts]
