@@ -531,3 +531,31 @@ Vector Database (Day 5)
 
 ### Next
 - Day 5 — Advanced Document Chunking Engineering.
+
+
+## Day 6 — Vector Database Engineering
+
+### Added
+- PostgreSQL and pgvector infrastructure.
+- Initial relational database schema.
+- Document persistence tables.
+- Document chunk persistence tables.
+- Vector embedding persistence.
+- HNSW vector index.
+- PostgreSQL connection layer.
+- VectorRepository protocol.
+- PostgreSQL vector repository.
+- Similarity search implementation.
+- Metadata filtering examples.
+- Vector repository integration tests.
+
+### Architecture Decisions
+- Selected PostgreSQL + pgvector.
+- Selected cosine distance for retrieval.
+- Selected HNSW for initial indexing.
+- Separated vector persistence from embedding generation.
+- Introduced JSONB metadata storage.
+- Established tenant isolation requirements.
+
+### Next
+- Day 7 — Semantic Search and Retrieval Engineering.
