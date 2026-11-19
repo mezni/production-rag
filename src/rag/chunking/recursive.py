@@ -1,5 +1,8 @@
+from typing import ClassVar
+
+
 class RecursiveCharacterSplitter:
-    SEPARATORS = ["\n\n", "\n", ". ", " ", ""]
+    SEPARATORS: ClassVar[list[str]] = ["\n\n", "\n", ". ", " ", ""]
 
     def __init__(
         self,

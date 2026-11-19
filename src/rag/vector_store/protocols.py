@@ -14,4 +14,5 @@ class VectorRepository(Protocol):
         self,
         query_embedding: list[float],
         limit: int = 5,
+        tenant_id: str | None = None,
     ) -> list[dict]: ...

@@ -58,23 +58,25 @@ class PostgresVectorRepository:
         self,
         query_embedding: list[float],
         limit: int = 5,
+        tenant_id: str | None = None,
     ) -> list[dict]:
 
         if len(query_embedding) != self.dimensions:
-            raise ValueError("Invalid query dimensions")
+            raise ValueError("Invalid embedding dimensions")
 
         if limit <= 0:
             raise ValueError("Limit must be positive")
+
+        if not tenant_id:
+            raise ValueError("Tenant ID is required")
 
         query = """
             SELECT
                 dc.id AS chunk_id,
                 dc.document_id,
                 dc.content,
-                dc.chunk_index,
                 dc.metadata,
                 d.filename,
-                ce.model_name,
                 ce.embedding <=> %s AS distance
 
             FROM chunk_embeddings ce
@@ -86,6 +88,7 @@ class PostgresVectorRepository:
                 ON d.id = dc.document_id
 
             WHERE d.status = 'indexed'
+              AND d.tenant_id = %s
 
             ORDER BY ce.embedding <=> %s
 
@@ -97,7 +100,12 @@ class PostgresVectorRepository:
         with self.connection.cursor() as cursor:
             cursor.execute(
                 query,
-                (vector, vector, limit),
+                (
+                    vector,
+                    tenant_id,
+                    vector,
+                    limit,
+                ),
             )
 
             columns = [description.name for description in cursor.description]

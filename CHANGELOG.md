@@ -559,3 +559,31 @@ Vector Database (Day 5)
 
 ### Next
 - Day 7 — Semantic Search and Retrieval Engineering.
+
+
+## Day 7 — Semantic Search and Retrieval Engineering
+
+### Added
+- Retrieval domain models.
+- Retrieval repository protocol.
+- RetrievalService.
+- Query validation.
+- Query preprocessing.
+- Tenant-aware retrieval filters.
+- PostgreSQL semantic search integration.
+- Top-K retrieval.
+- Precision@K implementation.
+- Recall@K implementation.
+- Reciprocal Rank implementation.
+- Retrieval unit tests.
+
+### Architecture Decisions
+- Separated retrieval from generation.
+- Introduced independent RetrievalService.
+- Reused Day 4 embedding infrastructure.
+- Reused Day 6 vector persistence.
+- Established retrieval evaluation metrics.
+- Defined tenant-aware retrieval requirements.
+
+### Next
+- Day 8 — Hybrid Search Engineering (BM25 + Vector Search).
